@@ -1,0 +1,36 @@
+Determinism:
+  seed: 42
+  data_seed: 42
+
+Data:
+  dataloader_pin_memory: True
+
+Training: 
+  per_device_train_batch_size: 8
+  warmup_ratio: 0.05
+  learning_rate: 1.5e-5
+  num_train_epochs: 50
+
+  Floating-point:
+    fp16: True
+    fp16_full_eval: False
+
+Evaluation:
+  per_device_eval_batch_size: 16
+  evaluation_strategy: epoch
+
+Logging:
+  logging_strategy: steps
+  logging_first_step: True
+  logging_steps: 50
+  output_dir: roberta-ner-V1
+  # report_to: None
+  # report_to: wandb
+
+  Saving:
+    save_strategy: epoch
+    push_to_hub: False
+    save_total_limit: 1
+
+Optimizer:    
+  weight_decay: 0.01
