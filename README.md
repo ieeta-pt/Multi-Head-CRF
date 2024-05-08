@@ -13,7 +13,7 @@ This repository contains the implementation for the Multi-Head-CRF model as desc
 
 ## Overview
 
-The identification of medical concepts from clinical narratives has a large interest in the biomedical scientific community due to its importance in treatment improvements or drug development research. Biomedical Named Entity Recognition (NER) in clinical texts is crucial for automated information extraction, facilitating patient record analysis, drug development, and medical research. Traditional approaches often focus on single-class NER tasks, yet recent advancements emphasize the necessity of addressing multi-class scenarios, particularly in complex biomedical domains.  This paper proposes a strategy to integrate a Multi-Head Conditional Random Field (CRF) classifier for multi-class NER in Spanish clinical documents. Our methodology overcomes overlapping entity instances of different types, a common challenge in traditional NER methodologies, by using a multi-head CRF model. This architecture enhances computational efficiency and ensures scalability for multi-class NER tasks, maintaining high performance. By combining four diverse datasets, SympTEMIST, MedProcNER, DisTEMIST, and PharmaCoNER, we expand the scope of NER to encompass five classes: symptoms, procedures, diseases, chemicals, and proteins. To the best of our knowledge, these datasets combined create the largest Spanish multi-class dataset focusing on biomedical entity recognition and linking for clinical notes, which is important to train a biomedical model in Spanish. We also provide entity linking to the multi-lingual SNOMED CT vocabulary, with the eventual goal of performing biomedical relation extraction. Through experimentation and evaluation of Spanish clinical documents, our strategy provides competitive results against single-class NER models. For NER, our system achieves a combined micro-averaged F1-score of 78.73, with clinical mentions normalized to SNOMED CT with an end-to-end F1-score of 54.35.
+The identification of medical concepts from clinical narratives has a large interest in the biomedical scientific community due to its importance in treatment improvements or drug development research. Biomedical Named Entity Recognition (NER) in clinical texts is crucial for automated information extraction, facilitating patient record analysis, drug development, and medical research. Traditional approaches often focus on single-class NER tasks, yet recent advancements emphasize the necessity of addressing multi-class scenarios, particularly in complex biomedical domains. This paper proposes a strategy to integrate a Multi-Head Conditional Random Field (CRF) classifier for multi-class NER in Spanish clinical documents. Our methodology overcomes overlapping entity instances of different types, a common challenge in traditional NER methodologies, by using a multi-head CRF model. This architecture enhances computational efficiency and ensures scalability for multi-class NER tasks, maintaining high performance. By combining four diverse datasets, SympTEMIST, MedProcNER, DisTEMIST, and PharmaCoNER, we expand the scope of NER to encompass five classes: symptoms, procedures, diseases, chemicals, and proteins. To the best of our knowledge, these datasets combined create the largest Spanish multi-class dataset focusing on biomedical entity recognition and linking for clinical notes, which is important to train a biomedical model in Spanish. We also provide entity linking to the multi-lingual SNOMED CT vocabulary, with the eventual goal of performing biomedical relation extraction. Through experimentation and evaluation of Spanish clinical documents, our strategy provides competitive results against single-class NER models. For NER, our system achieves a combined micro-averaged F1-score of 78.73, with clinical mentions normalized to SNOMED CT with an end-to-end F1-score of 54.35.
 
 ## Setup
 
@@ -41,7 +41,7 @@ Alternatively, the dataset is available on:
 - [HuggingFace](https://huggingface.co/)
 - [Zenodo](https://zenodo.org/records/11121348)
 
-This step is requreied if you wish to run the Named Entity Linking or Evaluation. 
+This step is required if you wish to run the Named Entity Linking or Evaluation. 
 
 ## Named Entity Recognition
 
@@ -69,7 +69,7 @@ To run inference for the model, we provide an inference file:
 ## Named Entity Linking
 
 
-In order to utilize the SNOMED corpus, it is necessary to create a UMLS account and download the [file](https://download.nlm.nih.gov/umls/kss/IHTSDO20190131/SnomedCT_SpanishRelease-es_PRODUCTION_20190430T120000Z.zip). This folder is expected to be extracted into the embeddings directory. Although we do not supply the original dataset, we do supply all the embeddings used for SNOMED-CT and the various Gazetteers, which is available [here](TODO). 
+In order to utilize the SNOMED CT terminology, it is necessary to create a UMLS account and download the [file](https://download.nlm.nih.gov/umls/kss/IHTSDO20190131/SnomedCT_SpanishRelease-es_PRODUCTION_20190430T120000Z.zip). This folder is expected to be extracted into the embeddings directory. Although we do not supply the original resource, we do supply all the embeddings used for SNOMED CT and the various gazetteers, which are available [here](TODO).
 
 In order to build the embeddings, it is required to run the `embeddings\prepare_jsonl_for_embedding.py` script, which will create jsonl files from the various gazetteers.
 
@@ -81,7 +81,7 @@ With these embeddings we can conduct normalization (in `src`).
 
 ```python normalize.py INPUT_RUN --t 0.6 --use_gazzeter False --output_folder runs```
 
-Were `--t` is the the threshhold of acceptence, and `--use_gazzeter` is whether or not to use the gazetteers to normalize. 
+Were `--t` is the the threshold of acceptance, and `--use_gazzeter` is whether or not to use the gazetteers to normalize. 
 
 ## Evaluation
 
