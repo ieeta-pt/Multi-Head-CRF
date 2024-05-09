@@ -165,6 +165,29 @@ for docid in docids:
 
 
 
+#
+# For NER evaluation, the variable "true_docid2entities" is correct.
+#
+# However, for NEL evaluation we should only consider the entities that
+# are present in the NEL TSV file, and therefore we need to remove the
+# entities with missing codes (that is, entities that did not contain
+# a gold standard NEL annotation).
+#
+true_nel_docid2entities = {docid: list() for docid in docids}
+
+for docid in docids:
+    true_entities = true_docid2entities[docid]
+    #
+    # Remove entities that are with missing NEL codes, because these
+    # do not count for the entity linking evaluation.
+    #
+    true_nel_docid2entities[docid] = [e for e in true_entities if e['code'] != MISSING_CODE]
+
+
+
+
+
+
 
 
 
@@ -264,28 +287,28 @@ spanish_to_english = {
 unique_added_entities = set()
 pred_docid2entities = {docid: list() for docid in docids}
 
-for i,line in enumerate(pred_lines[1:]):
+for i, line in enumerate(pred_lines[1:]):
     docid, start, end, typ, code = line.split('\t')
     typ = spanish_to_english[typ]
-    #    
+    #
     e = dict()
     e['span_type'] = '{}-{};{}'.format(start, end, typ)
     #
-    if code in {'NOMAP', 'null', '<null>'}:
+    if code.lower() in {'nomap', 'null', '<null>'}:
         code = 'NO_CODE'
     #
     e['code'] = code
     #
     unique_entity = '{};{}'.format(docid, e['span_type'])
+    #
     if unique_entity in unique_added_entities:
         print('Repetition of {} (line {}, ignoring)'.format(repr(unique_entity), i))
-        continue
-    #assert unique_entity not in unique_added_entities, unique_entity
-    unique_added_entities.add(unique_entity)
-    #
-    UNIQUE_ENTITY_TYPES.add(typ)
-    #
-    pred_docid2entities[docid].append(e)
+    else:
+        unique_added_entities.add(unique_entity)
+        #
+        UNIQUE_ENTITY_TYPES.add(typ)
+        #
+        pred_docid2entities[docid].append(e)
 
 print('\n')
 
@@ -551,7 +574,7 @@ recall_per_class    = {c: 0.0 for c in UNIQUE_ENTITY_TYPES}
 acc_per_class       = {c: 0.0 for c in UNIQUE_ENTITY_TYPES}
 
 for docid in docids:
-    true_entities = true_docid2entities[docid]
+    true_entities = true_nel_docid2entities[docid]
     pred_entities = pred_docid2entities[docid]
     #
     # Micro-average.
@@ -708,7 +731,7 @@ recall_per_class    = {c: 0.0 for c in UNIQUE_ENTITY_TYPES}
 acc_per_class       = {c: 0.0 for c in UNIQUE_ENTITY_TYPES}
 
 for docid in docids:
-    true_entities = true_docid2entities[docid]
+    true_entities = true_nel_docid2entities[docid]
     pred_entities = pred_docid2entities[docid]
     #
     # Ignore composite mentions (according to the gold standard).

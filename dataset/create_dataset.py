@@ -30,7 +30,7 @@ for ds in ['train', 'test']:
         df['label'] = df['label'].str.replace('PROTEINAS','PROTEIN')
         df['label'] = df['label'].str.replace('NO_NORMALIZABLES','CHEMICAL')
         df['label'] = df['label'].str.replace('NORMALIZABLES','CHEMICAL')
-        #rmeove the unclear label since it is not mapped to an entity
+        #remove the unclear label since it is not mapped to an entity
         df = df[df['label'] != 'UNCLEAR']
 
         for i, row in df.iterrows():
@@ -44,7 +44,7 @@ for ds in ['train', 'test']:
     # df.drop('ann_id', axis=1, inplace=True)
     df.to_csv("merged_data_subtask1_"+ds+".tsv", index=False, sep='\t')
 
-    
+
 
 
 # merge distemist files and store the merged result
@@ -86,8 +86,10 @@ for ds in ['train', 'test']:
         df['label'] = df['label'].str.replace('PROTEINAS','PROTEIN')
         df['label'] = df['label'].str.replace('NO_NORMALIZABLES','CHEMICAL')
         df['label'] = df['label'].str.replace('NORMALIZABLES','CHEMICAL')
-        #rmeove the unclear label since it is not mapped to an entity
+        #remove the unclear label since it is not mapped to an entity
         df = df[df['label'] != 'UNCLEAR']
+        #replace "NOMAP" to "NO_CODE"
+        df['code'] = df['code'].str.replace('NOMAP','NO_CODE')
 
         for i, row in df.iterrows():
             # docs[row["filename"]].append({k:row[k] for k in ["ann_id", "label", "start_span", "end_span", "text"]})
@@ -111,7 +113,7 @@ for ds in ['train', 'test']:
                 'text':text,
                 'code':row['code']
                 })
-        
+
 
 
 
