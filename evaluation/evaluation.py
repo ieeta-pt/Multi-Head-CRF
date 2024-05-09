@@ -305,7 +305,20 @@ def fpr(tp, fn, fp):
         p = tp / (tp + fp)
         r = tp / (tp + fn)
         f = 2 * p * r / (p + r)
-        acc = tp / (tp + fp + fn)
+        #
+        # Accuracy is the ratio between "Correct classifications" and
+        # "All classifications".
+        # https://en.wikipedia.org/wiki/Accuracy_and_precision
+        #
+        # "All classifications" is the sum of "Correct classifications"
+        # and "Incorrect classifications".
+        #
+        # Regarding the evaluation of Entity Linking, note that Accuracy
+        # only matches F1-score when gold standard NER entities are
+        # employed. In this scenario, an "Incorrect classification" will
+        # add a FN (False Negative) and a FP (False Positive).
+        #
+        acc = 2*tp / (2*tp + fp + fn)
     return f, p, r, acc
 
 
