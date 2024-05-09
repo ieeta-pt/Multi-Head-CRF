@@ -210,6 +210,40 @@ assert len(header) == 5
 
 
 #
+# When loading the predictions from the TSV file make sure that the
+# entity types (labels, classes) are translated to English.
+#
+# Let's convert the entity types from Spanish to English.
+#
+spanish_to_english = {
+    'SINTOMA': 'SYMPTOM',
+    'PROCEDIMIENTO': 'PROCEDURE',
+    'ENFERMEDAD': 'DISEASE',
+    'NORMALIZABLES': 'CHEMICAL',
+    'NO_NORMALIZABLES': 'CHEMICAL',
+    'PROTEINAS': 'PROTEIN',
+    'UNCLEAR': 'UNCLEAR',
+    #
+    # Keep the new English labels equal.
+    #
+    'SYMPTOM': 'SYMPTOM',
+    'PROCEDURE': 'PROCEDURE',
+    'DISEASE': 'DISEASE',
+    'CHEMICAL': 'CHEMICAL',
+    'PROTEIN': 'PROTEIN',
+}
+
+
+
+
+
+
+
+
+
+
+
+#
 # Each line in the TSV file corresponds to one entity to add
 # in the respective DocID (file name).
 #
@@ -222,6 +256,7 @@ pred_docid2entities = {docid: list() for docid in docids}
 
 for i,line in enumerate(pred_lines[1:]):
     docid, start, end, typ, code = line.split('\t')
+    typ = spanish_to_english[typ]
     #    
     e = dict()
     e['span_type'] = '{}-{};{}'.format(start, end, typ)
