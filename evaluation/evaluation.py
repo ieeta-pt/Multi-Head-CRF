@@ -28,9 +28,9 @@ if len(args) != 2:
     print('                 the same from the other three datasets)')
     print()
     print('The input TSV file with NER and entity linking predictions should have exactly these five columns:')
-    print('doc_id         start_span    end_span    entity_type      code')
-    print('S0004-06142    1023          1044        PROCEDURE    449264008')
-    print('S0004-06142    208           240         PROCEDURE    449263002+449264008')
+    print('doc_id         start_span    end_span    entity_type    code')
+    print('S0004-06142    1023          1044        PROCEDURE      449264008')
+    print('S0004-06142    208           240         PROCEDURE      449263002+449264008')
     print()
     print('Note that composite mentions containing multiple codes are concatenated with a plus sign (+).')
     print()
@@ -109,21 +109,31 @@ merged_data = {}
 
 for dname, dataset in data.items():
     #
-    for dsplit, doc_data in dataset.items():
-        if dsplit not in merged_data:
-            merged_data[dsplit] = {
-                "docid2text": doc_data["docid2text"],
-                "docid2entities": {doc_id:EntitySet() for doc_id in doc_data["docid2entities"].keys()}
+    for _subset, d in dataset.items():
+        if _subset not in merged_data:
+            merged_data[_subset] = {
+                'docid2text': d['docid2text'],
+                'docid2entities': {docid: EntitySet() for docid in d['docid2text']}
             }
         #
-        for doc_id, entities_set in doc_data["docid2entities"].items():
-            for entitiy in entities_set:
-                if entitiy.typ != "UNCLEAR":
-                    merged_data[dsplit]["docid2entities"][doc_id].add(entitiy)
+        for docid, entities in d['docid2entities'].items():
+            for e in entities:
+                if e.typ != 'UNCLEAR':
+                    merged_data[_subset]['docid2entities'][docid].add(e)
+
+
+
+
+
+
 
 data = merged_data
+docids = set(data[subset]['docid2text'])
 
-docids = set(data[subset]['docid2entities'].keys())
+
+
+
+
 
 true_docid2entities = {docid: list() for docid in docids}
 
