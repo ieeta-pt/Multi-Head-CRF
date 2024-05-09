@@ -53,14 +53,14 @@ distemist_part2 = pd.read_csv('distemist/training/subtrack2_linking/distemist_su
 distemist_final = pd.concat([distemist_part1, distemist_part2])
 distemist_final.to_csv('distemist/training/subtrack2_linking/distemist_subtrack2_merged_linking.tsv', index=False, sep='\t')
 
-#for subtask1, prepare the dataset
-train = ['symptemist/symptemist_train/subtask2-linking/symptemist_tsv_train_subtask2.tsv',
+#for subtask2, prepare the dataset
+train = ['symptemist/symptemist_train/subtask2-linking/symptemist_tsv_train_subtask2_complete+COMPOSITE.tsv',
 'medprocner/medprocner_train/tsv/medprocner_tsv_train_subtask2.tsv',
 'distemist/training/subtrack2_linking/distemist_subtrack2_merged_linking.tsv',
 'pharmaconer/new_format/pharmaconer_task2_train.tsv']
 
 
-test = ['symptemist/symptemist_test/subtask2-linking/symptemist_tsv_test_subtask2.tsv',
+test = ['symptemist/symptemist_test/subtask2-linking/symptemist_tsv_test_subtask2+COMPOSITE.tsv',
 'medprocner/medprocner_test/tsv/medprocner_tsv_test_subtask2.tsv',
 'distemist/test_annotated/subtrack2_linking/distemist_subtrack2_test_linking.tsv',
 'pharmaconer/new_format/pharmaconer_task2_test.tsv',
@@ -84,8 +84,8 @@ for ds in ['train', 'test']:
         df['label'] = df['label'].str.replace('PROCEDIMIENTO','PROCEDURE')
         df['label'] = df['label'].str.replace('ENFERMEDAD','DISEASE')
         df['label'] = df['label'].str.replace('PROTEINAS','PROTEIN')
-        df['label'] = df['label'].str.replace('NORMALIZABLES','CHEMICAL')
         df['label'] = df['label'].str.replace('NO_NORMALIZABLES','CHEMICAL')
+        df['label'] = df['label'].str.replace('NORMALIZABLES','CHEMICAL')
         #rmeove the unclear label since it is not mapped to an entity
         df = df[df['label'] != 'UNCLEAR']
 
@@ -118,6 +118,3 @@ for ds in ['train', 'test']:
     df = pd.DataFrame(final_data).sort_values(by=['filename', 'start_span', 'end_span'])
 
     df.to_csv("merged_data_subtask2_"+ds+".tsv", index=False, sep='\t')
-
-
-    
