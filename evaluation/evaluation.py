@@ -99,7 +99,7 @@ UNIQUE_ENTITY_TYPES = set()
 # We will simplify how data is stored.
 #
 # For simplicity an entity will be represented as a dict():
-# {'span_type': '5-10;SINTOMA', 'code': '8943002'}
+# {'span_type': '5-10;SYMPTOM', 'code': '8943002'}
 #
 
 #
@@ -225,11 +225,15 @@ for i,line in enumerate(pred_lines[1:]):
     #    
     e = dict()
     e['span_type'] = '{}-{};{}'.format(start, end, typ)
+    #
+    if code in {'NOMAP', 'null', '<null>'}:
+        code = 'NO_CODE'
+    #
     e['code'] = code
     #
     unique_entity = '{};{}'.format(docid, e['span_type'])
     if unique_entity in unique_added_entities:
-        print("Repetion of",unique_entity,"line",i, "IGNORING")
+        print('Repetition of {} (line {}, ignoring)'.format(repr(unique_entity), i))
         continue
     #assert unique_entity not in unique_added_entities, unique_entity
     unique_added_entities.add(unique_entity)
@@ -238,7 +242,7 @@ for i,line in enumerate(pred_lines[1:]):
     #
     pred_docid2entities[docid].append(e)
 
-
+print('\n')
 
 
 
@@ -261,11 +265,12 @@ def fpr(tp, fn, fp):
         f = 0.0
         p = 0.0
         r = 0.0
+        acc = 0.0
     else:
         p = tp / (tp + fp)
         r = tp / (tp + fn)
         f = 2 * p * r / (p + r)
-        acc = tp/(tp + fp + fn)
+        acc = tp / (tp + fp + fn)
     return f, p, r, acc
 
 
@@ -588,12 +593,10 @@ print('\n')
 
 
 
-out_str = ""
-for c in ['CHEMICAL', 'PROTEIN', 'DISEASE',  'PROCEDURE', 'SYMPTOM']:
-    out_str+=" & {:.2f}".format((f1_per_class[c]*100))
-out_str+=" & {:.2f}".format(micro_f1*100)
 
-print(out_str)
+
+
+
 
 
 
@@ -744,12 +747,3 @@ for c in sorted(UNIQUE_ENTITY_TYPES):
     print('      FN: {:>5d}'.format(fn_per_class[c]))
     print('      FP: {:>5d}'.format(fp_per_class[c]))
     print('    --------------------------------')
-
-print('\n')
-
-out_str = ""
-for c in ['CHEMICAL', 'PROTEIN', 'DISEASE',  'PROCEDURE', 'SYMPTOM']:
-    out_str+=" & {:.2f}".format((f1_per_class[c]*100))
-out_str+=" & {:.2f} \\\\".format(micro_f1*100)
-
-print(out_str)

@@ -42,7 +42,7 @@ datasets = {
     'distemist': {
         'train': {
             'txt_dir': '../dataset/documents/',
-            'ner_tsv': '..dataset/distemist/training/subtrack1_entities/distemist_subtrack1_training_mentions.tsv',
+            'ner_tsv': '../dataset/distemist/training/subtrack1_entities/distemist_subtrack1_training_mentions.tsv',
             'nen_tsv': ['../dataset/distemist/training/subtrack2_linking/distemist_subtrack2_training1_linking.tsv',
                         '../dataset/distemist/training/subtrack2_linking/distemist_subtrack2_training2_linking.tsv'],
         },
@@ -55,13 +55,13 @@ datasets = {
     'pharmaconer': {
         'train': {
             'txt_dir': '../dataset/documents/',
-            'ner_tsv': '../dataset/pharmaconer/new_format/train/subtrack1-ner/pharmaconer_task1_train.tsv',
-            'nen_tsv': ['../dataset/pharmaconer/new_format/train/subtrack2-nen/pharmaconer_task2_train.tsv'],
+            'ner_tsv': '../dataset/pharmaconer/new_format/pharmaconer_task1_train.tsv',
+            'nen_tsv': ['../dataset/pharmaconer/new_format/pharmaconer_task2_train.tsv'],
         },
         'test': {
             'txt_dir': '../dataset/documents/',
-            'ner_tsv': '../dataset/pharmaconer/new_format/test/subtrack1-ner/pharmaconer_task1_train.tsv',
-            'nen_tsv': ['../dataset/pharmaconer/new_format/test/subtrack2-nen/pharmaconer_task2_train.tsv'],
+            'ner_tsv': '../dataset/pharmaconer/new_format/pharmaconer_task1_test.tsv',
+            'nen_tsv': ['../dataset/pharmaconer/new_format/pharmaconer_task2_test.tsv'],
         },
     },
 }
@@ -136,6 +136,20 @@ def valid_code(code):
     return True
 
 
+#
+# Let's convert the entity types from Spanish to English.
+#
+spanish_to_english = {
+    'SINTOMA': 'SYMPTOM',
+    'PROCEDIMIENTO': 'PROCEDURE',
+    'ENFERMEDAD': 'DISEASE',
+    'NORMALIZABLES': 'CHEMICAL',
+    'NO_NORMALIZABLES': 'CHEMICAL',
+    'PROTEINAS': 'PROTEIN',
+    'UNCLEAR': 'UNCLEAR',
+}
+
+
 for dname, dataset in datasets.items():
     for subset in dataset:
         #
@@ -155,6 +169,7 @@ for dname, dataset in datasets.items():
         #
         for line in ner_tsv_lines[1:]:
             docid, ann_id, label, start_span, end_span, text = line.strip().split('\t')
+            label = spanish_to_english[label]
             s = int(start_span)
             e = int(end_span)
             span = (s, e)
@@ -194,6 +209,7 @@ for dname, dataset in datasets.items():
                 docid, label, start_span, end_span, text, code = line.strip().split('\t')
             else:
                 assert False
+            label = spanish_to_english[label]
             s = int(start_span)
             e = int(end_span)
             span = (s, e)
