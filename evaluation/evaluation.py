@@ -72,7 +72,7 @@ print()
 
 import numpy as np
 
-from load_datasets import data
+from load_datasets import data, MISSING_CODE
 from elements import EntitySet
 from utils import read_file
 
@@ -494,6 +494,14 @@ print('\n')
 
 
 def codes_are_equal(code1, code2):
+    #
+    # Before comparing the codes let's convert the string to lowercase
+    # because the PharmaCoNER uses the "chebi:" and "CHEBI:" prefix
+    # identifiers interchangeably.
+    #
+    code1 = code1.lower()
+    code2 = code2.lower()
+    #
     code1_set = set(code1.split('+'))
     code2_set = set(code2.split('+'))
     return code1_set == code2_set

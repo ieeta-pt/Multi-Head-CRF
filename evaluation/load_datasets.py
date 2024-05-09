@@ -4,7 +4,7 @@
 
 #
 # How to use this file in another Python file:
-# from load_datasets import datasets, data
+# from load_datasets import datasets, data, MISSING_CODE
 #
 
 from elements import Entity
@@ -12,6 +12,23 @@ from elements import EntitySet
 
 from utils import get_filepaths
 from utils import read_file
+
+
+#
+# String that denotes that an entity is missing a normalization code
+# for Named Entity Linking (NEL). That is, the respective entity is not
+# present in the NEL TSV file.
+#
+# Note that this is different than the "NO_CODE" attribution.
+# A "NO_CODE" attribution is a gold standard annotation meaning that an
+# entity has no candidate normalization code.
+#
+# The entities with missing codes (that is, entities that are present in
+# the NER TSV file but are missing from the NEL TSV file) will not be
+# considered for NEL evaluation. A missing code means that an entity
+# is missing a NEL annotation.
+#
+MISSING_CODE = '---missing-code---'
 
 
 datasets = {
@@ -174,21 +191,35 @@ for dname, dataset in datasets.items():
             e = int(end_span)
             span = (s, e)
             #
-            # Extra step of processing to fix some entity mentions
-            # that are incorrect.
+            # This is a required extra step of processing because data is
+            # incorrectly saved in the SympTEMIST and MedProcNER datasets.
+            #
+            # That is, when an entity mention has a quotation mark (") these symbols
+            # are duplicated and the string is enclosed inside quotation marks.
+            # Therefore we need to remove this to keep consistency against the
+            # original clinical text.
             #
             if text.startswith('"') and text.endswith('"'):
                 text = text[1:-1]
                 text = text.replace('""', '"')
             assert data[dname][subset]['docid2text'][docid][s:e] == text
             #
+            # Note that this "add" method already ignores repeated entities.
+            #
             data[dname][subset]['docid2entities'][docid].add(Entity(text, span, label))
         #
         # Third, add the normalization identifiers (codes) into the respective entities.
         #
+        # Note that, by default, we attribute a "missing code" to denote
+        # that the entity is missing a normalization code.
+        # This should not be expected, but it is what happens in the datasets,
+        # that is, there are entities that are not present in the NEL TSV file...
+        # In other words, there are entities that are missing codes (not even "NO_CODE"
+        # they have...).
+        #
         for docid, entities in data[dname][subset]['docid2entities'].items():
             for e in entities:
-                e.code = 'NO_CODE'
+                e.code = MISSING_CODE
         #
         nen_tsv_lines = list()
         for i, nen_tsv_file in enumerate(dataset[subset]['nen_tsv']):
@@ -201,11 +232,19 @@ for dname, dataset in datasets.items():
                 nen_tsv_lines += lines[1:]
         #
         for line in nen_tsv_lines[1:]:
-            if dname in {'symptemist', 'medprocner'}:
+            if dname == 'symptemist':
+                #
+                # Also, I noticed that some values in the "is_composite" column
+                # are incorrect. That is, there are some rows (entities) that
+                # contain multiple codes, but it says "False" in the
+                # "is_composite" column.
+                #
+                docid, label, start_span, end_span, text, code, sem_rel, is_composite, is_abbrev, need_context = line.strip().split('\t')
+            elif dname == 'medprocner':
                 docid, label, start_span, end_span, text, code, sem_rel, is_abbrev, is_composite, need_context = line.strip().split('\t')
-            elif dname in {'distemist'}:
+            elif dname == 'distemist':
                 docid, ann_id, label, start_span, end_span, text, code, sem_rel = line.strip().split('\t')
-            elif dname in {'pharmaconer'}:
+            elif dname == 'pharmaconer':
                 docid, label, start_span, end_span, text, code = line.strip().split('\t')
             else:
                 assert False
@@ -214,9 +253,10 @@ for dname, dataset in datasets.items():
             e = int(end_span)
             span = (s, e)
             #
-            # Deal with incorrect identifiers.
+            # I found some identifiers that are incorrect.
+            # We take care of these below.
             #
-            if (dname in {'distemist'}) and (code == 'NOMAP'):
+            if (dname =='distemist') and (subset == 'train') and (code == 'NOMAP'):
                 code = 'NO_CODE'
             #
             INCORRECT_CODES = [
@@ -234,7 +274,14 @@ for dname, dataset in datasets.items():
             found = False
             for e in data[dname][subset]['docid2entities'][docid]:
                 if e.span == span:
-                    e.code = code
+                    #
+                    # Make sure that repeated entities in the NEL TSV
+                    # file share exactly the same normalization code.
+                    #
+                    if e.code != MISSING_CODE:
+                        assert e.code == code
+                    else:
+                        e.code = code
                     found = True
                     break
             assert found
