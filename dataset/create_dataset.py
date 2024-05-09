@@ -90,6 +90,8 @@ for ds in ['train', 'test']:
         df = df[df['label'] != 'UNCLEAR']
         #replace "NOMAP" to "NO_CODE"
         df['code'] = df['code'].str.replace('NOMAP','NO_CODE')
+        #replace "chebi:" to "CHEBI:"
+        df['code'] = df['code'].str.replace('chebi:','CHEBI:')
 
         for i, row in df.iterrows():
             # docs[row["filename"]].append({k:row[k] for k in ["ann_id", "label", "start_span", "end_span", "text"]})
