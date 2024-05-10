@@ -310,7 +310,72 @@ for i, line in enumerate(pred_lines[1:]):
         #
         pred_docid2entities[docid].append(e)
 
-print('\n')
+print('\n\n')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if UNIQUE_ENTITY_TYPES == {'CHEMICAL', 'PROTEIN', 'DISEASE', 'PROCEDURE', 'SYMPTOM'}:
+    #
+    # Summarized results for pretty table.
+    #
+    summarized_results = {
+        'ner': {
+            'counts': 0,
+            'entities': {
+                'CHEMICAL':  {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'PROTEIN':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'DISEASE':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'PROCEDURE': {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'SYMPTOM':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+            },
+            'micro': {'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+            'macro': {'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+        },
+        'nel_including_composite_mentions': {
+            'counts': 0,
+            'entities': {
+                'CHEMICAL':  {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'PROTEIN':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'DISEASE':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'PROCEDURE': {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'SYMPTOM':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+            },
+            'micro': {'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+            'macro': {'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+        },
+        'nel_excluding_composite_mentions': {
+            'counts': 0,
+            'entities': {
+                'CHEMICAL':  {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'PROTEIN':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'DISEASE':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'PROCEDURE': {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+                'SYMPTOM':   {'counts': 0, 'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+            },
+            'micro': {'TP': 0, 'FP': 0, 'FN': 0, 'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+            'macro': {'p': 0.0, 'r': 0.0, 'f': 0.0, 'a': 0.0},
+        },
+    }
+
+
 
 
 
@@ -353,6 +418,7 @@ def fpr(tp, fn, fp):
         #
         acc = 2*tp / (2*tp + fp + fn)
     return f, p, r, acc
+
 
 
 
@@ -495,6 +561,35 @@ print('\n')
 
 
 
+
+if UNIQUE_ENTITY_TYPES == {'CHEMICAL', 'PROTEIN', 'DISEASE', 'PROCEDURE', 'SYMPTOM'}:
+    #
+    task = 'ner'
+    #
+    summarized_results[task]['counts'] += total_tp + total_fn
+    #
+    for c in UNIQUE_ENTITY_TYPES:
+        summarized_results[task]['entities'][c]['counts'] = tp_per_class[c] + fn_per_class[c]
+        summarized_results[task]['entities'][c]['TP'] = tp_per_class[c]
+        summarized_results[task]['entities'][c]['FP'] = fp_per_class[c]
+        summarized_results[task]['entities'][c]['FN'] = fn_per_class[c]
+        summarized_results[task]['entities'][c]['p'] = precision_per_class[c]
+        summarized_results[task]['entities'][c]['r'] = recall_per_class[c]
+        summarized_results[task]['entities'][c]['f'] = f1_per_class[c]
+        summarized_results[task]['entities'][c]['a'] = acc_per_class[c]
+    #
+    summarized_results[task]['micro']['TP'] = total_tp
+    summarized_results[task]['micro']['FP'] = total_fp
+    summarized_results[task]['micro']['FN'] = total_fn
+    summarized_results[task]['micro']['p'] = micro_precision
+    summarized_results[task]['micro']['r'] = micro_recall
+    summarized_results[task]['micro']['f'] = micro_f1
+    summarized_results[task]['micro']['a'] = micro_acc
+    #
+    summarized_results[task]['macro']['p'] = macro_precision
+    summarized_results[task]['macro']['r'] = macro_recall
+    summarized_results[task]['macro']['f'] = macro_f1
+    summarized_results[task]['macro']['a'] = macro_acc
 
 
 
@@ -694,6 +789,74 @@ print('\n')
 
 
 
+
+if UNIQUE_ENTITY_TYPES == {'CHEMICAL', 'PROTEIN', 'DISEASE', 'PROCEDURE', 'SYMPTOM'}:
+    #
+    task = 'nel_including_composite_mentions'
+    #
+    summarized_results[task]['counts'] += total_tp + total_fn
+    #
+    for c in UNIQUE_ENTITY_TYPES:
+        summarized_results[task]['entities'][c]['counts'] = tp_per_class[c] + fn_per_class[c]
+        summarized_results[task]['entities'][c]['TP'] = tp_per_class[c]
+        summarized_results[task]['entities'][c]['FP'] = fp_per_class[c]
+        summarized_results[task]['entities'][c]['FN'] = fn_per_class[c]
+        summarized_results[task]['entities'][c]['p'] = precision_per_class[c]
+        summarized_results[task]['entities'][c]['r'] = recall_per_class[c]
+        summarized_results[task]['entities'][c]['f'] = f1_per_class[c]
+        summarized_results[task]['entities'][c]['a'] = acc_per_class[c]
+    #
+    summarized_results[task]['micro']['TP'] = total_tp
+    summarized_results[task]['micro']['FP'] = total_fp
+    summarized_results[task]['micro']['FN'] = total_fn
+    summarized_results[task]['micro']['p'] = micro_precision
+    summarized_results[task]['micro']['r'] = micro_recall
+    summarized_results[task]['micro']['f'] = micro_f1
+    summarized_results[task]['micro']['a'] = micro_acc
+    #
+    summarized_results[task]['macro']['p'] = macro_precision
+    summarized_results[task]['macro']['r'] = macro_recall
+    summarized_results[task]['macro']['f'] = macro_f1
+    summarized_results[task]['macro']['a'] = macro_acc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def is_composite_mention(code):
     if '+' in code:
         return True
@@ -836,3 +999,174 @@ for c in sorted(UNIQUE_ENTITY_TYPES):
     print('      FN: {:>5d}'.format(fn_per_class[c]))
     print('      FP: {:>5d}'.format(fp_per_class[c]))
     print('    --------------------------------')
+
+print('\n')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if UNIQUE_ENTITY_TYPES == {'CHEMICAL', 'PROTEIN', 'DISEASE', 'PROCEDURE', 'SYMPTOM'}:
+    #
+    task = 'nel_excluding_composite_mentions'
+    #
+    summarized_results[task]['counts'] += total_tp + total_fn
+    #
+    for c in UNIQUE_ENTITY_TYPES:
+        summarized_results[task]['entities'][c]['counts'] = tp_per_class[c] + fn_per_class[c]
+        summarized_results[task]['entities'][c]['TP'] = tp_per_class[c]
+        summarized_results[task]['entities'][c]['FP'] = fp_per_class[c]
+        summarized_results[task]['entities'][c]['FN'] = fn_per_class[c]
+        summarized_results[task]['entities'][c]['p'] = precision_per_class[c]
+        summarized_results[task]['entities'][c]['r'] = recall_per_class[c]
+        summarized_results[task]['entities'][c]['f'] = f1_per_class[c]
+        summarized_results[task]['entities'][c]['a'] = acc_per_class[c]
+    #
+    summarized_results[task]['micro']['TP'] = total_tp
+    summarized_results[task]['micro']['FP'] = total_fp
+    summarized_results[task]['micro']['FN'] = total_fn
+    summarized_results[task]['micro']['p'] = micro_precision
+    summarized_results[task]['micro']['r'] = micro_recall
+    summarized_results[task]['micro']['f'] = micro_f1
+    summarized_results[task]['micro']['a'] = micro_acc
+    #
+    summarized_results[task]['macro']['p'] = macro_precision
+    summarized_results[task]['macro']['r'] = macro_recall
+    summarized_results[task]['macro']['f'] = macro_f1
+    summarized_results[task]['macro']['a'] = macro_acc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# Finally, we present a summarized table with all the results.
+#
+
+
+if UNIQUE_ENTITY_TYPES == {'CHEMICAL', 'PROTEIN', 'DISEASE', 'PROCEDURE', 'SYMPTOM'}:
+    #
+    print('\n\n\n')
+    #
+    draw = (
+        '  ================================================================================\n'
+        '  === NER (named entity recognition) strict evaluation (exact match)           ===\n'
+        '  ================================================================================\n'
+        '  9999999  entities      TP     FP     FN  Precision    Recall  F1-score  Accuracy\n'
+        '  -----------------  --------------------  -----------------------------  --------\n'
+        '  9999999  CHEMICAL  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   PROTEIN  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   DISEASE  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999 PROCEDURE  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   SYMPTOM  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  -----------------  --------------------  -----------------------------  --------\n'
+        '     micro-averaged  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '     macro-averaged                         0.999999  0.999999  0.999999  0.999999\n'
+        '  ================================================================================\n'
+        '\n'
+        '\n'
+        '  ================================================================================\n'
+        '  === NEL (named entity linking) evaluation including composite mentions       ===\n'
+        '  ================================================================================\n'
+        '  9999999  entities      TP     FP     FN  Precision    Recall  F1-score  Accuracy\n'
+        '  -----------------  --------------------  -----------------------------  --------\n'
+        '  9999999  CHEMICAL  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   PROTEIN  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   DISEASE  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999 PROCEDURE  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   SYMPTOM  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  -----------------  --------------------  -----------------------------  --------\n'
+        '     micro-averaged  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '     macro-averaged                         0.999999  0.999999  0.999999  0.999999\n'
+        '  ================================================================================\n'
+        '\n'
+        '\n'
+        '  ================================================================================\n'
+        '  === NEL (named entity linking) evaluation excluding composite mentions       ===\n'
+        '  ================================================================================\n'
+        '  9999999  entities      TP     FP     FN  Precision    Recall  F1-score  Accuracy\n'
+        '  -----------------  --------------------  -----------------------------  --------\n'
+        '  9999999  CHEMICAL  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   PROTEIN  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   DISEASE  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999 PROCEDURE  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  9999999   SYMPTOM  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '  -----------------  --------------------  -----------------------------  --------\n'
+        '     micro-averaged  999999 999999 999999   0.999999  0.999999  0.999999  0.999999\n'
+        '     macro-averaged                         0.999999  0.999999  0.999999  0.999999\n'
+        '  ================================================================================\n'
+        '\n'
+    )
+    #
+    draw = draw.replace('9999999', '{:7d}')
+    draw = draw.replace('0.999999', '{:8.6f}')
+    draw = draw.replace('999999', '{:6d}')
+    #
+    # Concatenate all the values into a list.
+    #
+    s = summarized_results
+    #
+    values = list()
+    #
+    for task in ['ner', 'nel_including_composite_mentions',
+                        'nel_excluding_composite_mentions']:
+        values.append(s[task]['counts'])
+        for c in ['CHEMICAL', 'PROTEIN', 'DISEASE', 'PROCEDURE', 'SYMPTOM']:
+            values.extend(s[task]['entities'][c].values())
+        #
+        values.extend(s[task]['micro'].values())
+        values.extend(s[task]['macro'].values())
+    #
+    # Print final summarized table.
+    #
+    draw = draw.format(*values)
+    #
+    print(draw)
