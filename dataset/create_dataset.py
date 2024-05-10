@@ -36,10 +36,11 @@ for ds in ['train', 'test']:
         for i, row in df.iterrows():
             # docs[row["filename"]].append({k:row[k] for k in ["ann_id", "label", "start_span", "end_span", "text"]})
             final_data.append(row)
-        
 
-    data = [{"filename":os.path.join("documents",f"{k}.txt"), "annotations":v} for k,v in docs.items()]    
+
     df = pd.DataFrame(final_data).sort_values(by=['filename', 'start_span', 'end_span'])
+    #remove repeated entities
+    df = df.drop_duplicates(subset=['filename', 'label', 'start_span', 'end_span']).reset_index(drop=True)
     df['ann_id'] = df.groupby('filename').cumcount()
     # df.drop('ann_id', axis=1, inplace=True)
     df.to_csv("merged_data_subtask1_"+ds+".tsv", index=False, sep='\t')
@@ -106,12 +107,12 @@ for ds in ['train', 'test']:
                     end_span = row[k]
             for k in text_labels:
                 if k in dict(row).keys():
-                    text = row[k]  
+                    text = row[k]
             final_data.append({
-                'filename':row['filename'], 
-                'label':row['label'], 
-                'start_span':start_span, 
-                'end_span':end_span, 
+                'filename':row['filename'],
+                'label':row['label'],
+                'start_span':start_span,
+                'end_span':end_span,
                 'text':text,
                 'code':row['code']
                 })
@@ -120,5 +121,7 @@ for ds in ['train', 'test']:
 
 
     df = pd.DataFrame(final_data).sort_values(by=['filename', 'start_span', 'end_span'])
+    #remove repeated entities
+    df = df.drop_duplicates(subset=['filename', 'label', 'start_span', 'end_span']).reset_index(drop=True)
 
     df.to_csv("merged_data_subtask2_"+ds+".tsv", index=False, sep='\t')
