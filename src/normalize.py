@@ -14,9 +14,9 @@ from transformers import AutoTokenizer, AutoModel
 @click.command()
 @click.argument("input_run")
 @click.option("--t", default=0.6)
-@click.option("--use_gazzeter", is_flag=True)
+@click.option("--use_gazetteer", is_flag=True)
 @click.option("--output_folder", default="runs")
-def main(input_run, t, use_gazzeter, output_folder):
+def main(input_run, t, use_gazetteer, output_folder):
     
     run = pd.read_csv(input_run, sep="\t")
     
@@ -185,7 +185,7 @@ def main(input_run, t, use_gazzeter, output_folder):
     distemist_training_semantic_lookup = build_embedding_lookup_function("../dataset/distemist/distemist_gazetteer/", threshold=t)
      
     
-    if use_gazzeter:
+    if use_gazetteer:
         medprocner_cascade = [ medprocner_training_lookup, medprocner_training_semantic_lookup]
         symptemist_cascade = [ symptemist_training_lookup, symptemist_training_semantic_lookup]
         distemist_cascade = [ distemist_training_lookup, distemist_training_semantic_lookup]
@@ -244,7 +244,7 @@ def main(input_run, t, use_gazzeter, output_folder):
         
             if isinstance(entity["code"], list):
                 
-                most_freq_id, _ = max([(linked_id, len(id_entities[linked_id])) for linked_id in entity["code"]], key=lambda x:x[1])                    
+                most_freq_id, _ = max([(linked_id, len(id_entities[linked_id])) for linked_id in entity["code"]], key=lambda x:x[1])
                 entity["code"] = most_freq_id
 
     data = [entity for annotations in document_annotations.values() for entity in annotations]
@@ -261,8 +261,8 @@ def main(input_run, t, use_gazzeter, output_folder):
     fname, _ = os.path.splitext(input_run)
     
     notes=""
-    if use_gazzeter:
-        notes="_wGazzeter"
+    if use_gazetteer:
+        notes="_wGazetteer"
     
     file_name = os.path.basename(fname)
     

@@ -39,7 +39,7 @@ To set up the dataset, a script is provided (`dataset/download_dataset.sh`) that
 
 Alternatively, the dataset is available on:
 - [HuggingFace](https://huggingface.co/datasets/IEETA/SPACCC-Spanish-NER)
-- [Zenodo](https://zenodo.org/records/11121348)
+- [Zenodo](https://zenodo.org/records/11174163)
 
 This step is required if you wish to run the Named Entity Linking or Evaluation. 
 
@@ -79,9 +79,9 @@ In order to build the embeddings it is required to run `embeddings\build_embeddi
 
 With these embeddings we can conduct normalization (in `src`).
 
-```python normalize.py INPUT_RUN --t 0.6 --use_gazzeter False --output_folder runs```
+```python normalize.py INPUT_RUN --t 0.6 --use_gazetteer False --output_folder runs```
 
-Were `--t` is the the threshold of acceptance, and `--use_gazzeter` is whether or not to use the gazetteers to normalize. 
+Were `--t` is the the threshold of acceptance, and `--use_gazetteer` is whether or not to use the gazetteers to normalize. 
 
 ## Evaluation
 
