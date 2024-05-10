@@ -69,7 +69,7 @@ To run inference for the model, we provide an inference file:
 ## Named Entity Linking
 
 
-In order to utilize the SNOMED CT terminology, it is necessary to create a UMLS account and download the [file](https://download.nlm.nih.gov/umls/kss/IHTSDO20190131/SnomedCT_SpanishRelease-es_PRODUCTION_20190430T120000Z.zip). This folder is expected to be extracted into the embeddings directory. Although we do not supply the original resource, we do supply all the embeddings used for SNOMED CT and the various gazetteers, which are available [here](TODO).
+In order to utilize the SNOMED CT terminology, it is necessary to create a UMLS account and download the [file](https://download.nlm.nih.gov/umls/kss/IHTSDO20190131/SnomedCT_SpanishRelease-es_PRODUCTION_20190430T120000Z.zip). This folder is expected to be extracted into the embeddings directory. Although we do not supply the original resource, we do supply all the embeddings used for SNOMED CT and the various gazetteers, which are available [here](https://zenodo.org/records/11174163), with a script available in `embeddings/download_embeddings.sh`
 
 In order to build the embeddings, it is required to run the `embeddings\prepare_jsonl_for_embedding.py` script, which will create jsonl files from the various gazetteers.
 
@@ -94,8 +94,7 @@ The evaluation can be run as follows:
 
 - Verify Pipeline
 - Upload models
-- requirements
-- script to download embeddings
+
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
