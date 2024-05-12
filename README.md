@@ -93,7 +93,8 @@ The evaluation (NER and entity linking) can be run in the [evaluation/](evaluati
 ## TODO
 
 - Verify Pipeline
-- Upload models
+- model download script
+
 
 
 ## License
