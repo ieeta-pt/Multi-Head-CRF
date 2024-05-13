@@ -66,6 +66,9 @@ To run inference for the model, we provide an inference file, which will conduct
 `python inference.py --checkpoint MODEL_CHECKPOINT`
 
 
+We also provide several of our best performing models available on [Hugging Face](https://huggingface.co/datasets/IEETA/Multi-Head-CRF), which can be downloaded using the python script provided in (`models/download_models.py`). 
+
+
 ## Named Entity Linking
 
 
