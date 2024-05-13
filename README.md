@@ -38,7 +38,7 @@ All datasets are licensed under CC4.
 To set up the dataset, a script is provided (`dataset/download_dataset.sh`) that downloads these datasets, prepares them in the correct format, and merges them to create a unified dataset.
 
 Alternatively, the dataset is available on:
-- [HuggingFace](https://huggingface.co/datasets/IEETA/SPACCC-Spanish-NER)
+- [Hugging Face](https://huggingface.co/datasets/IEETA/SPACCC-Spanish-NER)
 - [Zenodo](https://zenodo.org/records/11174163)
 
 This step is required if you wish to run the Named Entity Linking or Evaluation. 
