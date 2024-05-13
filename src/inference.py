@@ -73,7 +73,7 @@ def main(checkpoint, out_folder):
     model = model.to(f"cuda")
     tokenizer.model_max_length = 512
     
-    _entities = sorted(['SINTOMA' , 'PROCEDIMIENTO', 'ENFERMEDAD', 'PROTEINAS', 'CHEMICAL'])
+    _entities = sorted(['SYMPTOM', 'PROCEDURE', 'DISEASE', 'PROTEIN', 'CHEMICAL'])
     
     
     _, test_ds = load_train_test(tokenizer=tokenizer,
