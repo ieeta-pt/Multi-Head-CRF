@@ -93,12 +93,5 @@ The evaluation (NER and entity linking) can be run in the [evaluation/](evaluati
 `python3  evaluation.py  train/test  PREDICTIONS_FILE.tsv`
 
 
-## TODO
-
-- Verify Pipeline
-- model download script
-
-
-
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
