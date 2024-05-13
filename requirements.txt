@@ -3,5 +3,5 @@ click==8.1.7
 numpy==1.26.4
 pandas==2.2.0
 torch==2.0.0
-tqdm
+tqdm>=4.66.3
 transformers==4.40.2
