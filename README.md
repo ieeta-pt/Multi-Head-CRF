@@ -62,7 +62,7 @@ python hf_trainer_MHC_full.py lcampillos/roberta-es-clinical-trials-ner --augmen
 - `--classes`: Classes to train, must be a combination of: SYMPTOM PROCEDURE DISEASE PROTEIN CHEMICAL.
 - `--val`: Whether to use a validation dataset; otherwise, the test dataset is utilized.
 
-To run inference for the model, we provide an inference file:
+To run inference for the model, we provide an inference file, which will conduct inference over the test dataset by default:
 `python inference.py --checkpoint MODEL_CHECKPOINT`
 
 
