@@ -135,6 +135,8 @@ config.args_random_seed = args.random_seed
 config.augmentation = args.augmentation
 config.context_size = args.context
 config.percentage_tags = args.percentage_tags
+config.aug_prob = args.aug_prob
+
 
 config.freeze = False
 config.crf_reduction = "mean"
