@@ -16,4 +16,4 @@ for file, name in files.items():
     data['text'] = data['term']
     data = data[['id','text']]
     with open(name+".jsonl", 'w') as f:
-        print(data.to_json(orient='records', lines=True),file=f, flush=False)
+        print(data.to_json(orient='records', lines=True),file=f, flush=False, end="")

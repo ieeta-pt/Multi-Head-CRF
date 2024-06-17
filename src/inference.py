@@ -60,7 +60,7 @@ def remove_txt(data):
     return new_data
 
 @click.command()
-@click.option("--checkpoint")
+@click.argument("checkpoint")
 @click.option("--out_folder", default="runs")
 def main(checkpoint, out_folder):
     
@@ -69,7 +69,16 @@ def main(checkpoint, out_folder):
         #single GPU bc CRF
         assert torch.cuda.device_count()==1
     
-    model, tokenizer, config = load_model_local(checkpoint)
+    
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+
+    model = AutoModel.from_pretrained(checkpoint, 
+                                        trust_remote_code=True,
+                                        cache_dir="trained-models")
+    
+    config = model.config
+        
+    #model, tokenizer, config = load_model_local(checkpoint)
     model = model.to(f"cuda")
     tokenizer.model_max_length = 512
     

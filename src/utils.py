@@ -3,7 +3,6 @@ import yaml
 from transformers import TrainingArguments, AutoConfig, AutoTokenizer, PretrainedConfig, BertConfig
 # from BERT_DENSE_CRF import BERTDenseCRF
 # from BERT_LSTM_CRF import BERTLstmCRF
-from model import MultiHeadCRF
 import torch
 from huggingface_hub import hf_hub_download
 import json

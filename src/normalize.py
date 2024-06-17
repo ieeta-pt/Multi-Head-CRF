@@ -103,8 +103,8 @@ def main(input_run, t, use_gazetteer, output_folder):
     _path = "../embeddings"
 
     for file_p in filter(lambda x: x.endswith(".jsonl"), os.listdir(_path)):
-        with open(os.path.join(_path, file_p)) as f:
-            embeddings_id[file_p.split(".")[0]] = [x["id"] for x in map(json.loads, f)]
+        with open(os.path.join(_path, file_p),  encoding='utf-8') as f:
+            embeddings_id[file_p.split(".")[0]] = [json.loads(x)["id"] for x in f if x != "\n"]
 
     for file_p in filter(lambda x:x.endswith(".npy"), os.listdir(_path)):
         _embeddings = torch.as_tensor(np.load(os.path.join(_path, file_p))).to(device)

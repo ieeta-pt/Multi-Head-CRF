@@ -5,3 +5,5 @@ pandas==2.2.0
 torch==2.0.0
 tqdm>=4.66.3
 transformers==4.40.2
+sentencepiece==0.2.0
+protobuf==3.20.0
