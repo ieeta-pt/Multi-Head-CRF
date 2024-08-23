@@ -34,6 +34,11 @@ This step is required if you wish to run the Named Entity Linking or Evaluation.
 
 ## Named Entity Recognition
 
+Go to src directory
+```bash
+cd src
+```
+
 To train a model, use the following command:
 
 ```bash
@@ -52,11 +57,21 @@ python hf_trainer.py lcampillos/roberta-es-clinical-trials-ner --augmentation ra
 - `--val`: Whether to use a validation dataset; otherwise, the test dataset is utilized.
 
 To run inference for the model, we provide an inference file, which will conduct inference over the test dataset by default:
-`python inference.py --checkpoint MODEL_CHECKPOINT`
+`python inference.py MODEL_CHECKPOINT`
 
 
-We also provide several of our best performing models available on [Hugging Face](https://huggingface.co/datasets/IEETA/Multi-Head-CRF), which can be downloaded using the python script provided in (`models/download_models.py`). 
+We also provide several of our best performing models available on [Hugging Face](https://huggingface.co/collections/IEETA/multi-head-crf-classifier-6641e5907fc7e7c22bc4a85d).
 
+- [IEETA/RobertaMultiHeadCRF-C32-0](https://huggingface.co/IEETA/RobertaMultiHeadCRF-C32-0)
+- [IEETA/RobertaMultiHeadCRF-C32-1](https://huggingface.co/IEETA/RobertaMultiHeadCRF-C32-1)
+- [IEETA/RobertaMultiHeadCRF-C32-2](https://huggingface.co/IEETA/RobertaMultiHeadCRF-C32-2)
+- [IEETA/RobertaMultiHeadCRF-C32-3](https://huggingface.co/IEETA/RobertaMultiHeadCRF-C32-3)
+
+Example:
+
+```bash
+python inference.py IEETA/RobertaMultiHeadCRF-C32-0
+```
 
 ## Named Entity Linking
 
