@@ -72,7 +72,13 @@ def main(checkpoint, out_folder):
     
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
-    model = AutoModel.from_pretrained(checkpoint, 
+    if os.path.exists(checkpoint):
+        from model.modeling_multiheadcrf import RobertaMultiHeadCRFModel
+        # it may crash if its not a roberta based model
+        model = RobertaMultiHeadCRFModel.from_pretrained(checkpoint)
+    else:
+        # probably comes from HUB
+        model = AutoModel.from_pretrained(checkpoint, 
                                         trust_remote_code=True,
                                         cache_dir="trained-models")
     
