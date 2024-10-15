@@ -119,9 +119,9 @@ class RangeDict():
         return c , l  
     
     def maybe_merge_annotations(self, annotation):
-
+        # print(annotation)
         c, l = self.span_collision(((annotation["start_span"], annotation["end_span"])))
-        
+        # print(c,l)
         # there is a collision issue?
         if c>0:
             ann_starts = list(map(lambda x:x["start_span"],l))
@@ -133,12 +133,16 @@ class RangeDict():
         return None
         
     def get_all_annotations(self):
-        ann_id_set = set()
+        # return self.data.values()   
+
+        span_set = set()
         unique_anns = []
         for ann in self.data.values():
-            if ann["ann_id"] not in ann_id_set:
-                ann_id_set.add(ann["ann_id"])
+            candidate =f"{ann['start_span']}_{ann['end_span']}"
+            if candidate not in span_set:
+                span_set.add(candidate)
                 unique_anns.append(ann)
+
                 
         
         return unique_anns   

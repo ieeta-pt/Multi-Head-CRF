@@ -1,0 +1,30 @@
+Job Information for Job ID: 777 from richardjonker
+------------ ------------
+Account: students
+CPUs per Node: 2
+RAM: 4G
+GPUs:
+- GPU 0: NVIDIA RTX A2000 
+Partition: gpu
+QOS: students-qos
+Start Time: 2024-10-09 16:09:19 WEST
+Running On Node: dl-srv-02
+------------ ------------
+python3  evaluation.py  test  runs/IEETA-RobertaMultiHeadCRF-C32-0.tsv
+
+Subset:
+    test
+
+Predictions file path:
+    'runs/IEETA-RobertaMultiHeadCRF-C32-0.tsv'
+
+Traceback (most recent call last):
+  File "/data/home/richardjonker/work/Multi-Head-CRF/evaluation/evaluation.py", line 80, in <module>
+    pred = read_file(pred_filepath)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/home/richardjonker/work/Multi-Head-CRF/evaluation/utils.py", line 25, in read_file
+    fp = open(filepath, mode='r', encoding='utf-8')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'runs/IEETA-RobertaMultiHeadCRF-C32-0.tsv'
+------------ ------------
+End Time: 2024-10-09 16:09:25 WEST
