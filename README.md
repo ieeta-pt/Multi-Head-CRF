@@ -97,6 +97,106 @@ The evaluation (NER and entity linking) can be run in the [evaluation/](evaluati
 `python3  evaluation.py  train/test  PREDICTIONS_FILE.tsv`
 
 
+
+
+## How to use the architecture on a new Dataset
+
+In order to create a new Dataset, you will need to create a function that returns a corpus, for example the function `Spanish_Biomedical_NER_Corpus`. A full example can be seen below. 
+
+### 1. `Corpus`
+The `Corpus` class represents a collection of documents with annotations. Each document in the corpus must adhere to the following format:
+```json
+{
+    "doc_id": "unique_document_identifier",
+    "text": "document_text",
+    "annotations": [
+        {"label": "LABEL", "start_span": start_position, "end_span": end_position},
+        ...
+    ]
+}
+```
+
+#### Methods:
+- `__init__(data: list)`: Initializes the corpus. The `data` must be a list of documents with the structure mentioned above.
+- `__len__()`: Returns the number of documents in the corpus.
+- `get_entities()`: Returns a set of all unique entity labels in the corpus.
+- `split(split: float)`: Splits the corpus into two sets (training and testing) based on the provided split ratio.
+
+### 2. `CorpusPreProcessor`
+The `CorpusPreProcessor` class is responsible for applying transformations and filters to the corpus.
+
+#### Methods:
+- `__init__(corpus: Corpus)`: Initializes the preprocessor with a `Corpus` object.
+- `filter_labels(labels: list)`: Filters the annotations to keep only those with labels that match the provided list.
+- `merge_annotations()`: Merges overlapping or adjacent annotations based on their span. If a collision is found, the annotations are merged.
+- `split_data(test_split_percentage: float)`: Splits the corpus into training and test sets based on the provided split percentage.
+
+### 4. `CorpusTokenizer`
+The `CorpusTokenizer` class tokenizes the corpus using a given tokenizer (e.g., from the Hugging Face library) and prepares it for training by splitting it into context windows.
+
+#### Parameters:
+- `corpus: CorpusPreProcessor`: The preprocessed corpus to tokenize.
+- `tokenizer`: A tokenizer that tokenizes the text (e.g., Hugging Face's tokenizers).
+- `context_size`: The size of the context to be added before and after the main token sequence (optional).
+
+#### Methods:
+- `__tokenize()`: Tokenizes the entire corpus.
+- `__split()`: Splits the tokenized corpus into windows, handling context and special tokens (if any).
+
+### 5. `CorpusDataset`
+This class wraps the tokenized corpus into a dataset compatible with PyTorch's `DataLoader`.
+
+#### Parameters:
+- `tokenized_corpus: CorpusTokenizer`: The tokenized corpus.
+- `transforms`: Optional transformations to apply to each sample.
+- `augmentations`: Optional augmentations to apply to each sample.
+
+
+
+## Usage Example
+
+```python
+# First, create a generic Corpus
+spanishCorpus = Spanish_Biomedical_NER_Corpus(
+    "../dataset/merged_data_subtask1_train.tsv", 
+    "../dataset/documents"
+)
+
+# Create a Corpus PreProcessor, which handles certain preprocessing tasks: 
+# merging annotations, filtering labels, and splitting the data.
+spanishCorpusProcessor = CorpusPreProcessor(spanishCorpus)
+spanishCorpusProcessor.merge_annoatation()
+spanishCorpusProcessor.filter_labels(classes)
+
+# Split the corpus into training and testing sets with a 33% split.
+train_corpus, test_corpus = spanishCorpusProcessor.split_data(0.33)
+
+# Create a CorpusTokenizer, using the CorpusPreProcessor. 
+# This internally tokenizes the dataset and splits the documents.
+tokenized_train_corpus = CorpusTokenizer(train_corpus, tokenizer, CONTEXT_SIZE)
+
+# Finally, create the dataset by applying transformations. 
+# The order of transformations is important (BioTagging should be applied first).
+train_ds = CorpusDataset(
+    tokenized_corpus=tokenized_train_corpus, 
+    transforms=transforms, 
+    augmentation=train_augmentation
+)
+
+# Repeat the process for the test set
+tokenized_test_corpus = CorpusTokenizer(test_corpus, tokenizer, CONTEXT_SIZE)
+test_ds = CorpusDataset(
+    tokenized_corpus=tokenized_test_corpus
+)
+```
+
+This example shows the workflow of using the `Corpus`, `CorpusPreProcessor`, `CorpusTokenizer`, and `CorpusDataset` classes to create a dataset for a Named Entity Recognition (NER) task. It includes:
+
+1. Loading a corpus from a dataset.
+2. Preprocessing the corpus to merge annotations, filter specific labels, and split the data.
+3. Tokenizing the processed corpus and splitting documents.
+4. Creating a dataset with specified transformations and augmentations.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
