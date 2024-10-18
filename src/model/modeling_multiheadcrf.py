@@ -109,7 +109,7 @@ class RobertaMultiHeadCRFModel(PreTrainedModel):
             # loss
             outputs = {k:0 for k in self.heads}
             for ent in self.heads:
-                
+                # print(logits[ent].shape,labels[ent].shape )
                 outputs[ent] = getattr(self, f"{ent}_crf")(logits[ent],labels[ent], reduction=self.reduction) 
 
             # print(outputs)

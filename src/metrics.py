@@ -2,6 +2,7 @@ from decoder import decoder
 from trainer import NERevalPrediction
 
 
+
 def f1PR(tp, fn, fp):
     precision = 0 if tp == 0 else tp / (tp + fp)
     recall = 0 if tp == 0 else tp / (tp + fn)

@@ -144,7 +144,8 @@ class NERTrainer(Trainer):
 
         metadata = [ {"doc_id":inputs["doc_id"][i], 
                       "sequence_id":inputs["sequence_id"][i], 
-                      "og_annotations": inputs["og_annotations"][i],
+                    #   "annotations": inputs["annotations"][i],
+                    #   "og_annotations": inputs["og_annotations"][i],
                       "list_annotations": inputs["list_annotations"][i],
                       "offsets": inputs["offsets"][i]} for i in range(len(inputs["doc_id"]))]
         for i in range(len(logits)):

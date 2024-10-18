@@ -226,7 +226,7 @@ pred_lines = pred.splitlines()
 
 
 header = pred_lines[0].split('\t')
-assert len(header) == 5
+assert len(header) == 6
 
 
 
@@ -288,7 +288,7 @@ unique_added_entities = set()
 pred_docid2entities = {docid: list() for docid in docids}
 
 for i, line in enumerate(pred_lines[1:]):
-    docid, start, end, typ, code = line.split('\t')
+    docid, start, end, typ, code, _ = line.split('\t')
     typ = spanish_to_english[typ]
     #
     e = dict()

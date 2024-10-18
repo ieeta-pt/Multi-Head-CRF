@@ -1,7 +1,7 @@
 import click
 
 from utils import load_model, load_model_and_tokenizer, load_model_local
-from data import load_train_test, BIOTagger, SelectModelInputs, EvaluationDataCollator, DocumentReaderDatasetForTraining
+from data import Spanish_Biomedical_NER_Corpus, CorpusTokenizer,CorpusDataset, CorpusPreProcessor ,BIOTagger, SelectModelInputs,RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
 from transformers import AutoConfig, AutoTokenizer, DataCollatorForTokenClassification, AutoModelForMaskedLM,AutoModel
 import transformers
 from decoder import decoder
@@ -90,14 +90,12 @@ def main(checkpoint, out_folder):
     
     _entities = sorted(['SYMPTOM', 'PROCEDURE', 'DISEASE', 'PROTEIN', 'CHEMICAL'])
     
-    
-    _, test_ds = load_train_test(tokenizer=tokenizer,
-                                          context_size=config.context_size,
-                                          train_transformations=None,
-                                          train_augmentations=None,
-                                          test_transformations=None,
-                                          entity = _entities)
-
+    testSpanishCorpus = Spanish_Biomedical_NER_Corpus("../dataset/merged_data_subtask1_test.tsv","../dataset/documents" )
+    testSpanishCorpusProcessor = CorpusPreProcessor(testSpanishCorpus)
+    testSpanishCorpusProcessor.merge_annoatation()
+    testSpanishCorpusProcessor.filter_labels(_entities)
+    tokenized_test_corpus = CorpusTokenizer(testSpanishCorpusProcessor, tokenizer, config.context_size)
+    test_ds = CorpusDataset(tokenized_corpus=tokenized_test_corpus)   
     
     eval_datacollator = EvaluationDataCollator(tokenizer=tokenizer, 
                                             padding=True,
@@ -116,7 +114,7 @@ def main(checkpoint, out_folder):
             eval_batch |= eval_batch["inputs"]
             del eval_batch["inputs"]
         keys = list(eval_batch.keys())
-        
+    
         for i in range(len(eval_batch["doc_id"])):
             outputs.append({k:eval_batch[k][i] for k in keys})
 
