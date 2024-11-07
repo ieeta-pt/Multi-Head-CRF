@@ -4,8 +4,7 @@ import random
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 from transformers import AutoTokenizer, AutoConfig
 import json
-
-from data import load_train_test, load_train_val, SelectModelInputs, BIOTagger, RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
+from data import Spanish_Biomedical_NER_Corpus, CorpusTokenizer,CorpusDataset, CorpusPreProcessor ,BIOTagger, SelectModelInputs,RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
 from trainer import NERTrainer
 
 from model.modeling_multiheadcrf import RobertaMultiHeadCRFModel, BertMultiHeadCRFModel
@@ -118,19 +117,38 @@ if __name__ == "__main__":
         
 
     if args.val:
-        train_ds, test_ds = load_train_val(tokenizer=tokenizer,
-                                            context_size=CONTEXT_SIZE,
-                                            test_split_percentage=0.33,
-                                            train_transformations=transforms,
-                                            train_augmentations=train_augmentation,
-                                            test_transformations=None)
+        
+        # First create a generic Corpus
+        spanishCorpus = Spanish_Biomedical_NER_Corpus("../dataset/merged_data_subtask1_train.tsv","../dataset/documents" )
+        #  create a Corpus PreProcessor, which handles certain preprocessing : merge_annoatation, filter_labels, split_data
+        spanishCorpusProcessor = CorpusPreProcessor(spanishCorpus)
+        spanishCorpusProcessor.merge_annoatation()
+        spanishCorpusProcessor.filter_labels(classes)
+        train_corpus, test_corpus = spanishCorpusProcessor.split_data(0.33)
+        #  create a CorpusTokenizer, using the CorpusProcessor, which internally tokenizes the dataset and splits documents
+        tokenized_train_corpus = CorpusTokenizer(train_corpus, tokenizer, CONTEXT_SIZE)
+        # finally create the dataset by applying transformations, of which order is important (BioTagging should be run first)
+        train_ds = CorpusDataset(tokenized_corpus=tokenized_train_corpus, transforms=transforms, augmentation=train_augmentation)
+
+        tokenized_test_corpus = CorpusTokenizer(test_corpus, tokenizer, CONTEXT_SIZE)
+        test_ds = CorpusDataset(tokenized_corpus=tokenized_test_corpus)
+        
+        
+
     else:
-        train_ds, test_ds = load_train_test(tokenizer=tokenizer,
-                                            context_size=CONTEXT_SIZE,
-                                            train_transformations=transforms,
-                                            train_augmentations=train_augmentation,
-                                            test_transformations=None,
-                                            entity = classes)
+        trainSpanishCorpus = Spanish_Biomedical_NER_Corpus("../dataset/merged_data_subtask1_train.tsv","../dataset/documents" )
+        trainSpanishCorpusProcessor = CorpusPreProcessor(trainSpanishCorpus)
+        trainSpanishCorpusProcessor.merge_annoatation()
+        trainSpanishCorpusProcessor.filter_labels(classes)
+        tokenized_train_corpus = CorpusTokenizer(trainSpanishCorpusProcessor, tokenizer, CONTEXT_SIZE)
+        train_ds = CorpusDataset(tokenized_corpus=tokenized_train_corpus, transforms=transforms, augmentations=train_augmentation)
+
+        testSpanishCorpus = Spanish_Biomedical_NER_Corpus("../dataset/merged_data_subtask1_test.tsv","../dataset/documents" )
+        testSpanishCorpusProcessor = CorpusPreProcessor(testSpanishCorpus)
+        testSpanishCorpusProcessor.merge_annoatation()
+        testSpanishCorpusProcessor.filter_labels(classes)
+        tokenized_test_corpus = CorpusTokenizer(testSpanishCorpusProcessor, tokenizer, CONTEXT_SIZE)
+        test_ds = CorpusDataset(tokenized_corpus=tokenized_test_corpus)
 
 
     id2label = {0:"O", 1:"B", 2:"I"}
