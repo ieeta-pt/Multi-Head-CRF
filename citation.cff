@@ -17,6 +17,7 @@ url: https://doi.org/10.1093/database/baae068
 doi: 10.1093/database/baae068
 date-released: '2024-11-07'
 preferred-citation:
+  type: article
   authors:
     - family-names: Jonker
       given-names: Richard A A
