@@ -28,10 +28,10 @@ from operator import itemgetter
 
 class Corpus:
     #  A class that represent a corpus. If you want a specific dataset, you need to implement a function that returns a corpus
-    def __init__(self, data: list ):
+    def __init__(self, data: list, inference=False ):
         
         assert set(data[0].keys()) == set(["doc_id", "text", "annotations"]) , "Every document needs to contain a field call 'doc_id', 'text' and 'annotation'"
-        assert set(data[0]["annotations"][0].keys()) == set(['label', 'start_span', 'end_span']), "Every annotation needs to contain a 'start_span', 'end_span' and 'label'"
+        assert set(data[0]["annotations"][0].keys()) == set(['label', 'start_span', 'end_span']) or inference == True , "Every annotation needs to contain a 'start_span', 'end_span' and 'label', or you neeed to be in inference mode"
         
         #Data needs to be formated as follows {"doc_id":id, "text": doucment_text, "annotations":[{'label': LABEL, 'start_span': num, 'end_span': num}, ... ]  }   
         self.corpus = data
