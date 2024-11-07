@@ -174,7 +174,7 @@ if __name__ == "__main__":
     training_args.eval_steps = len(train_ds)//training_args.per_device_train_batch_size*training_args.num_train_epochs//5
     print("STEPS", training_args.eval_steps)
 
-    #training_args.save_steps = training_args.eval_steps
+    training_args.save_steps = training_args.eval_steps
 
     trainer = NERTrainer(
         model=model,
