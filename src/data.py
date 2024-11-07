@@ -69,15 +69,7 @@ class CorpusPreProcessor:
             filtered_annotations = [ann for ann in document['annotations'] if ann['label'] in labels]
             filtered_data.append({'doc_id':document['doc_id'], 'text': document['text'], 'annotations':filtered_annotations})
         self.corpus = Corpus(filtered_data)
-        
-    # def add_ids_to_annotations(self):    
-    #     id =0    
-    #     for document in self.data:
-    #         # id = defaultdict(lambda: 0)
-    #         for ann in document['annotations']:
-    #             id +=1
-    #             ann['ann_id'] = ann['label'][:4] +"_"+ str(id[ann['label']])
-    
+            
     def merge_annoatation(self):
         total_collisions=defaultdict(lambda: 0)
         entities  = self.corpus.get_entities()
@@ -109,30 +101,24 @@ class CorpusPreProcessor:
         trainCorpus, testCorpus = self.corpus.split(test_split_percentage)
         return  CorpusPreProcessor(trainCorpus), CorpusPreProcessor(testCorpus)
     
+class Spanish_Biomedical_NER_Corpus(Corpus):
+	def __init__(self, file_path, documents_folder):
+		annotations = defaultdict(list)
+		df = pd.read_csv(file_path, sep="\t")
+		for _, row in df.iterrows():
+			annotations[row["filename"]].append({k:row[k] for k in ["label", "start_span", "end_span"]})
+
+		#load the documents
+		document_text = {}
+		for file in annotations.keys():
+			with open(os.path.join(documents_folder,f"{file}.txt"), 'r') as f:
+				document_text[file] = ''.join([line for line in f]).strip()
+
+		data = [{"doc_id":k, "text":document_text[k], "annotations":v} for k,v in annotations.items()]   
+
+		super().__init__(data)
 
 
-def Spanish_Biomedical_NER_Corpus(file_path, documents_folder):
-    # file_path: tsv with the columns "label", "start_span", "end_span", "filename"
-    # document_path: dir containing the filenames
-    
-    # Load the data into a dictionary
-    annotations = defaultdict(list)
-    df = pd.read_csv(file_path, sep="\t")
-    for _, row in df.iterrows():
-        annotations[row["filename"]].append({k:row[k] for k in ["label", "start_span", "end_span"]})
-    
-    #load the documents
-    document_text = {}
-    for file in annotations.keys():
-        with open(os.path.join(documents_folder,f"{file}.txt"), 'r') as f:
-            document_text[file] = ''.join([line for line in f]).strip()
-    
-    data = [{"doc_id":k, "text":document_text[k], "annotations":v} for k,v in annotations.items()]    
-    
-    corpus = Corpus(data)
-    
-    return corpus
-    
     
 class CorpusTokenizer:
     def __init__(self, corpus: CorpusPreProcessor, tokenizer, context_size = 0):
@@ -285,95 +271,6 @@ class CorpusDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         sample = self.dataset[index]
         return sample
-
-
-
-
-    
-    
-    
-    
-        
-# class Conll_Dataset(Dataset):
-    # assumes data is in the Conll format (tsv): word,fileID,span,tag, 
-    # span is assumed to take the form start_end.
-    # What	document1	163_166	O
-    # document1.txt is assumed to exist within the documents folder
-    
-    # def __init__(self, path):
-    #     self.load_data(path)
-    #     # self.merge_bio_tags()
-       
-    
-    # def load_data(self, path ):
-    #     with open(path,'r') as file:
-            
-    #         lines = [x.lower() for x in file.readlines()]
-    #         file_content = set(lines)
-    #         print(len(lines), len(file_content))
-    #         for line in file_content:
-    #             line = line.rstrip('\n')
-    #             if line != '': # checking empty string 
-    #                 if len(line.split('\t')) !=4:
-    #                     print(len(line.split('\t')))
-    #                     logging.error("Error parsing the CoNLL file format for the line: "+line)
-    #                 else:
-    #                     word,file_name,span,tag = line.split('\t')                        
-    #                     start_span, end_span = span.split('_')
-    #                     # if tag != 'O' and {"start_span": int(start_span),"end_span":int(end_span), "label":tag, "text": word} not in self.data[file_name]:        
-    #                     self.data[file_name].append({"start_span": int(start_span),"end_span":int(end_span), "label":tag, "text": word})
-    #     for file, data in self.data.items():
-    #         # print(data)
-    #         tmp_strings = []
-    #         for tmp in data:
-    #             if tmp['label'] != 'o':
-    #                 tmp_strings.append(f"{tmp['start_span']}_{tmp['end_span']}_{tmp['label']}")
-            
-    #         if (len(set(tmp_strings))!= len(tmp_strings)):
-    #             print(data)
-    #             print(sorted(tmp_strings))
-
-    #             print(len(data), len(tmp_strings), len(set(tmp_strings)))
-    
-    
-    # # def load_data(self, path ):
-    # #     with open(path,'r') as file:
-    # #         for line in file.readlines():
-    # #             line = line.rstrip('\n')
-    # #             if line != '': # checking empty string 
-    # #                 if len(line.split('\t')) !=4:
-    # #                     print(len(line.split('\t')))
-    # #                     logging.error("Error parsing the CoNLL file format for the line: "+line)
-    # #                 else:
-    # #                     word,file_name,span,tag = line.split('\t')                        
-    # #                     start_span, end_span = span.split('_')
-    # #                     if tag != 'O' and {"start_span": int(start_span),"end_span":int(end_span), "label":tag, "text": word} not in self.data[file_name]:        
-    # #                         self.data[file_name].append({"start_span": int(start_span),"end_span":int(end_span), "label":tag, "text": word})
-                            
-                            
-    # def merge_bio_tags(self):
-    #     # This function takes the B-Person I person, and merges into a single span person, assumes that the pairs are ordered
-    #     # edit this is a bad practice
-    #     new_data = defaultdict(list)
-    #     for file, annotations in self.data.items():
-    #         for annotation in sorted(annotations, key=lambda d: d['start_span']):
-    #         # for annotation in annotations:
-
-    #             if annotation['label'][0] == 'b':
-    #                 annotation['label'] = annotation['label'][2:]
-    #                 new_data[file].append(annotation)
-    #             else:
-    #                 new_data[file][-1]['end_span'] = annotation['end_span']
-    #                 new_data[file][-1]['text'] += " " + annotation['text']
-                
-    #     self.data = new_data
-
-                            # docs[row["filename"]].append({k:row[k] for k in ["ann_id", "label", "start_span", "end_span", "text"]})
-    
-        
-    # data = [{"filename":os.path.join("../dataset/documents",f"{k}.txt"), "annotations":v} for k,v in docs.items()]
-
-
 
 class SelectModelInputs():
     
