@@ -17,6 +17,7 @@ class MultiHeadCRFConfig(PretrainedConfig):
         crf_reduction = "mean",
         freeze = False,
         version="0.1.3",
+        layer_norm_eps=1e-12,
         **kwargs,
     ):
         self.classes = classes
@@ -29,6 +30,7 @@ class MultiHeadCRFConfig(PretrainedConfig):
         self.crf_reduction = crf_reduction
         self.freeze=freeze
         self.version = version
+        self.layer_norm_eps = layer_norm_eps
         super().__init__(**kwargs)
         
 
