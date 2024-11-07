@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: If you use this software, please cite both the article from preferred-citation and the software itself.
+authors:
+  - family-names: Jonker
+    given-names: Richard A A
+  - family-names: Almeida
+    given-names: Tiago
+  - family-names: Antunes
+    given-names: Rui
+  - family-names: Almeida
+    given-names: João R
+  - family-names: Matos
+    given-names: Sérgio
+title: Multi-head CRF classifier for biomedical multi-class named entity recognition on Spanish clinical notes
+version: 1.0.0
+url: https://doi.org/10.1093/database/baae068
+doi: 10.1093/database/baae068
+date-released: '2024-11-07'
+preferred-citation:
+  authors:
+    - family-names: Jonker
+      given-names: Richard A A
+    - family-names: Almeida
+      given-names: Tiago
+    - family-names: Antunes
+      given-names: Rui
+    - family-names: Almeida
+      given-names: João R
+    - family-names: Matos
+      given-names: Sérgio
+  title: Multi-head CRF classifier for biomedical multi-class named entity recognition on Spanish clinical notes
+  doi: 10.1093/database/baae068
+  url: https://doi.org/10.1093/database/baae068
+  type: article-journal
+  pages: baae068
+  year: '2024'
+  conference: {}
+  publisher: {}
