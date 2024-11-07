@@ -110,7 +110,7 @@ The `Corpus` class represents a collection of documents with annotations. Each d
     "doc_id": "unique_document_identifier",
     "text": "document_text",
     "annotations": [
-        {"label": "LABEL", "start_span": start_position, "end_span": end_position},
+        {"label": "LABEL", "start_span": "start_position", "end_span": "end_position"},
         ...
     ]
 }
