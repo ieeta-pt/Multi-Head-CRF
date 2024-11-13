@@ -163,7 +163,8 @@ if __name__ == "__main__":
                                                 percentage_tags = args.percentage_tags,
                                                 aug_prob = args.aug_prob,
                                                 freeze = False,
-                                                crf_reduction = "mean")
+                                                crf_reduction = "mean",
+                                                )
 
     model = RobertaMultiHeadCRFModel.from_pretrained(model_checkpoint, config=config)
     model.training_mode() # fix a stupid bug regarding weight inits
