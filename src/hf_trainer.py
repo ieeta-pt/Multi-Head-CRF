@@ -4,7 +4,8 @@ import random
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 from transformers import AutoTokenizer, AutoConfig
 import json
-from data import Spanish_Biomedical_NER_Corpus, CorpusTokenizer,CorpusDataset, CorpusPreProcessor ,BIOTagger, SelectModelInputs,RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
+from data import CorpusTokenizer,CorpusDataset, CorpusPreProcessor ,BIOTagger, SelectModelInputs,RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
+from corpus import Spanish_Biomedical_NER_Corpus
 from trainer import NERTrainer
 
 from model.modeling_multiheadcrf import RobertaMultiHeadCRFModel, BertMultiHeadCRFModel

@@ -31,7 +31,7 @@ from collections import defaultdict
 class Corpus:
     #  A class that represent a corpus. If you want a specific dataset, you need to implement a function that returns a corpus
     def __init__(self, data: list, entities: list):
-        assert set(data[0].keys()) == set(["doc_id", "text"]) , "Every document needs to contain a field call 'doc_id', 'text'"
+        assert all([x in set(data[0].keys()) for x in ["doc_id", "text"]]) , "Every document needs to contain a field call 'doc_id', 'text'"
         #Data needs to be formated as follows {"doc_id":id, "text": doucment_text}   
         self.corpus = data
         self.entities = entities
@@ -59,14 +59,14 @@ class CorpusAnnotated(Corpus):
         assert set(data[0]["annotations"][0].keys()) == set(['label', 'start_span', 'end_span']), "Every annotation needs to contain a 'start_span', 'end_span' and 'label', or you neeed to be in inference mode"
         #Data needs to be formated as follows {"doc_id":id, "text": doucment_text, "annotations":[{'label': LABEL, 'start_span': num, 'end_span': num}, ... ]  }   
 
-        super().__init__(data, self.get_entities())
-        
-    def get_entities(self):
         entities = set()
-        for document in self.corpus:
+        for document in data:
             for annotation in document['annotations']:
                 entities.add(annotation['label'])
-        return entities
+        
+        super().__init__(data, entities)
+        
+
 
 class CorpusPreProcessor:  
         
