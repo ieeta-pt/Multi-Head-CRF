@@ -89,6 +89,7 @@ def main(checkpoint, out_folder):
     model = model.to(f"cuda")
     tokenizer.model_max_length = 512
     
+    # get the entities from the model
     _entities = config.classes #sorted(['SYMPTOM', 'PROCEDURE', 'DISEASE', 'PROTEIN', 'CHEMICAL'])
     
     # only the documents are needed because we are predicting
