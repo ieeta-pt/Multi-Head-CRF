@@ -1,17 +1,19 @@
 from typing import Any
-import torch
-import os
-import pandas as pd
+import warnings
+warnings.filterwarnings("ignore", message="Token indices sequence length is longer than the specified maximum sequence length")
+
+
 import random
-import math
+
+import pandas as pd
+import torch
+from transformers import DataCollatorForTokenClassification
+
 
 from utils import split_chunks, RangeDict
 from collections import defaultdict
 
-from transformers import DataCollatorForTokenClassification
 
-from itertools import groupby
-from operator import itemgetter
 
 # import logging
 
@@ -28,13 +30,12 @@ from operator import itemgetter
 
 class Corpus:
     #  A class that represent a corpus. If you want a specific dataset, you need to implement a function that returns a corpus
-    def __init__(self, data: list, inference=False ):
-        
-        assert set(data[0].keys()) == set(["doc_id", "text", "annotations"]) , "Every document needs to contain a field call 'doc_id', 'text' and 'annotation'"
-        assert set(data[0]["annotations"][0].keys()) == set(['label', 'start_span', 'end_span']) or inference == True , "Every annotation needs to contain a 'start_span', 'end_span' and 'label', or you neeed to be in inference mode"
-        
-        #Data needs to be formated as follows {"doc_id":id, "text": doucment_text, "annotations":[{'label': LABEL, 'start_span': num, 'end_span': num}, ... ]  }   
+    def __init__(self, data: list, entities: list):
+        assert all([x in set(data[0].keys()) for x in ["doc_id", "text"]]) , "Every document needs to contain a field call 'doc_id', 'text'"
+        #Data needs to be formated as follows {"doc_id":id, "text": doucment_text}   
         self.corpus = data
+        self.entities = entities
+    
     def __len__(self):
         return len(self.corpus)
     
@@ -44,13 +45,8 @@ class Corpus:
     def __getitem__(self, index):
         return self.corpus[index]
     
-    
     def get_entities(self):
-        entities = set()
-        for document in self.corpus:
-            for annotation in document['annotations']:
-                entities.add(annotation['label'])
-        return entities
+        return self.entities
         
     def split(self, split):
         split_index = int(len(self.corpus) * split)
@@ -58,9 +54,23 @@ class Corpus:
         testCorpus = Corpus(self.corpus[:split_index])
         return trainCorpus, testCorpus
 
+class CorpusAnnotated(Corpus):
+    def __init__(self, data):
+        assert set(data[0]["annotations"][0].keys()) == set(['label', 'start_span', 'end_span']), "Every annotation needs to contain a 'start_span', 'end_span' and 'label', or you neeed to be in inference mode"
+        #Data needs to be formated as follows {"doc_id":id, "text": doucment_text, "annotations":[{'label': LABEL, 'start_span': num, 'end_span': num}, ... ]  }   
+
+        entities = set()
+        for document in data:
+            for annotation in document['annotations']:
+                entities.add(annotation['label'])
+        
+        super().__init__(data, entities)
+        
+
+
 class CorpusPreProcessor:  
         
-    def __init__(self, corpus:Corpus):
+    def __init__(self, corpus:CorpusAnnotated):
         self.corpus = corpus
     
     def filter_labels(self, labels):
@@ -68,7 +78,7 @@ class CorpusPreProcessor:
         for document in self.corpus:
             filtered_annotations = [ann for ann in document['annotations'] if ann['label'] in labels]
             filtered_data.append({'doc_id':document['doc_id'], 'text': document['text'], 'annotations':filtered_annotations})
-        self.corpus = Corpus(filtered_data)
+        self.corpus = CorpusAnnotated(filtered_data)
             
     def merge_annoatation(self):
         total_collisions=defaultdict(lambda: 0)
@@ -100,24 +110,6 @@ class CorpusPreProcessor:
     def split_data(self, test_split_percentage):
         trainCorpus, testCorpus = self.corpus.split(test_split_percentage)
         return  CorpusPreProcessor(trainCorpus), CorpusPreProcessor(testCorpus)
-    
-class Spanish_Biomedical_NER_Corpus(Corpus):
-	def __init__(self, file_path, documents_folder):
-		annotations = defaultdict(list)
-		df = pd.read_csv(file_path, sep="\t")
-		for _, row in df.iterrows():
-			annotations[row["filename"]].append({k:row[k] for k in ["label", "start_span", "end_span"]})
-
-		#load the documents
-		document_text = {}
-		for file in annotations.keys():
-			with open(os.path.join(documents_folder,f"{file}.txt"), 'r') as f:
-				document_text[file] = ''.join([line for line in f]).strip()
-
-		data = [{"doc_id":k, "text":document_text[k], "annotations":v} for k,v in annotations.items()]   
-
-		super().__init__(data)
-
 
     
 class CorpusTokenizer:
@@ -149,18 +141,16 @@ class CorpusTokenizer:
     
     def __tokenize(self):
         for doc in self.corpus:
-            encoding = self.tokenizer(doc['text'], add_special_tokens=False)[0]
+            encoding = self.tokenizer(doc['text'], add_special_tokens=False, verbose=False)[0]
             tokens = encoding.ids
             offsets = encoding.offsets
             attention_mask = [1] * len(tokens)
             
             sample = {
-                        "doc_id": doc['doc_id'],
-                        "text": doc['text'],
                         "input_ids": tokens,
                         "attention_mask": attention_mask,
                         "offsets": offsets,
-                        "annotations": doc["annotations"]
+                        **doc
                     }
             self.dataset.append(sample)
 
@@ -208,15 +198,6 @@ class CorpusTokenizer:
                 else:
                     low_offset, high_offset = sample_offsets[1][0], sample_offsets[-2][1]
 
-                
-                sample_annotations = {k:RangeDict() for k in entities}
-
-                for annotation in doc["annotations"]:
-                    if annotation["start_span"] >= low_offset and annotation["start_span"]<=high_offset or annotation["end_span"] >= low_offset and annotation["end_span"]<=high_offset:         
-                        sample_annotations[annotation['label']][(annotation["start_span"], annotation["end_span"])] = annotation
-                        
-
-                    
                 sample = {
                     "doc_id": doc['doc_id'],
                     "text": doc['text'][low_offset: high_offset],
@@ -225,11 +206,21 @@ class CorpusTokenizer:
                     "attention_mask": sample_attention_mask,
                     "offsets": sample_offsets,
                     # "view_offset": (low_offset, high_offset),
-                    "annotations": doc["annotations"],
-                    "label_range_dict": sample_annotations, 
-                    "list_annotations": {k:v.get_all_annotations() for k,v in sample_annotations.items()},
                 }
-                
+               
+                if "annotations" in doc:
+                    sample_annotations = {k:RangeDict() for k in entities}
+                    
+                    for annotation in doc["annotations"]:
+                        if annotation["start_span"] >= low_offset and annotation["start_span"]<=high_offset or annotation["end_span"] >= low_offset and annotation["end_span"]<=high_offset:         
+                            sample_annotations[annotation['label']][(annotation["start_span"], annotation["end_span"])] = annotation
+                    
+                    sample["annotations"] = doc["annotations"]
+                    sample["label_range_dict"] = sample_annotations
+                    sample["list_annotations"] = {k:v.get_all_annotations() for k,v in sample_annotations.items()}
+                    
+
+                    
                 assert len(sample["input_ids"])<=self.tokenizer.model_max_length
                 assert len(sample["offsets"])<=self.tokenizer.model_max_length
                 

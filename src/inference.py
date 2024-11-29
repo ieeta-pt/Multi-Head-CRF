@@ -1,7 +1,8 @@
 import click
 
 from utils import load_model, load_model_and_tokenizer, load_model_local
-from data import Spanish_Biomedical_NER_Corpus, CorpusTokenizer,CorpusDataset, CorpusPreProcessor ,BIOTagger, SelectModelInputs,RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
+from corpus import Spanish_Biomedical_NER_Corpus_Inference
+from data import CorpusTokenizer,CorpusDataset, CorpusPreProcessor ,BIOTagger, SelectModelInputs,RandomlyUKNTokens, EvaluationDataCollator, RandomlyReplaceTokens, TrainDataCollator
 from transformers import AutoConfig, AutoTokenizer, DataCollatorForTokenClassification, AutoModelForMaskedLM,AutoModel
 import transformers
 from decoder import decoder
@@ -88,13 +89,15 @@ def main(checkpoint, out_folder):
     model = model.to(f"cuda")
     tokenizer.model_max_length = 512
     
-    _entities = sorted(['SYMPTOM', 'PROCEDURE', 'DISEASE', 'PROTEIN', 'CHEMICAL'])
+    # get the entities from the model
+    _entities = config.classes #sorted(['SYMPTOM', 'PROCEDURE', 'DISEASE', 'PROTEIN', 'CHEMICAL'])
     
-    testSpanishCorpus = Spanish_Biomedical_NER_Corpus("../dataset/merged_data_subtask1_test.tsv","../dataset/documents" )
+    # only the documents are needed because we are predicting
+    testSpanishCorpus = Spanish_Biomedical_NER_Corpus_Inference("../dataset/documents", entities=_entities)
+    
     testSpanishCorpusProcessor = CorpusPreProcessor(testSpanishCorpus)
-    testSpanishCorpusProcessor.merge_annoatation()
-    testSpanishCorpusProcessor.filter_labels(_entities)
     tokenized_test_corpus = CorpusTokenizer(testSpanishCorpusProcessor, tokenizer, config.context_size)
+    
     test_ds = CorpusDataset(tokenized_corpus=tokenized_test_corpus)   
     
     eval_datacollator = EvaluationDataCollator(tokenizer=tokenizer, 
