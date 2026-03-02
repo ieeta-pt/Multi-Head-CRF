@@ -50,8 +50,8 @@ class Corpus:
         
     def split(self, split):
         split_index = int(len(self.corpus) * split)
-        trainCorpus = Corpus(self.corpus[split_index:])
-        testCorpus = Corpus(self.corpus[:split_index])
+        trainCorpus = Corpus(self.corpus[split_index:], self.entities)
+        testCorpus = Corpus(self.corpus[:split_index], self.entities)
         return trainCorpus, testCorpus
 
 class CorpusAnnotated(Corpus):
