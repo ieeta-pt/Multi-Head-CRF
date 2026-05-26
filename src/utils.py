@@ -83,7 +83,7 @@ def setup_wandb(name, project):
     os.environ["WANDB_API_KEY"] = open(".api").read().strip()
     os.environ["WANDB_PROJECT"] = project 
     os.environ["WANDB_LOG_MODEL"]="false"
-    # os.environ["WANDB_ENTITY"] = "?"
+    os.environ["WANDB_ENTITY"] = "bitua"
     os.environ["WANDB_NAME"] = name
 
     # turn off watch to log faster
